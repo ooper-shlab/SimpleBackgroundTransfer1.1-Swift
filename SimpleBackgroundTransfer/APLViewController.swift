@@ -105,11 +105,19 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
     /*
     Using disptach_once here ensures that multiple background sessions with the same identifier are not created in this instance of the application. If you want to support multiple background sessions within a single process, you should create each session with its own identifier.
     */
-    //###Using lazy has the similar effect, not exactly the same.
-    private(set) lazy var backgroundSession: NSURLSession = {
-        let configuration = NSURLSessionConfiguration.backgroundSessionConfiguration("com.example.apple-samplecode.SimpleBackgroundTransfer.BackgroundSession")
-        return NSURLSession(configuration: configuration, delegate: self, delegateQueue: nil)
-        }()
+    //### Using static var to get the disptach_once-similar effect.
+    //### Removed (instance's) lazy var to avoid cyclic reference.
+    var backgroundSession: NSURLSession {
+        struct My {
+            static var staticSelf: ViewController!
+            static var backgroundSessionInstance: NSURLSession = {
+                let configuration = NSURLSessionConfiguration.backgroundSessionConfiguration("com.example.apple-samplecode.SimpleBackgroundTransfer.BackgroundSession")
+                return NSURLSession(configuration: configuration, delegate: staticSelf, delegateQueue: nil)
+                }()
+        }
+        My.staticSelf = self
+        return My.backgroundSessionInstance
+    }
     
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
