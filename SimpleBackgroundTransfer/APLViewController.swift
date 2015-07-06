@@ -63,6 +63,7 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
     
     
     //#warning To run this sample correctly, you must set an appropriate URL here.
+    //###And add (or replace "localhost" to) the hostname into SimpleBackgroundTransfer-Info.plist .
     private let DownloadURLString = "http://localhost/bigImage.png"
     
     
@@ -111,7 +112,12 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
         struct My {
             static var staticSelf: ViewController!
             static var backgroundSessionInstance: NSURLSession = {
-                let configuration = NSURLSessionConfiguration.backgroundSessionConfiguration("com.example.apple-samplecode.SimpleBackgroundTransfer.BackgroundSession")
+                let configuration: NSURLSessionConfiguration
+                if #available(iOS 8.0, *) {
+                    configuration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("com.example.apple-samplecode.SimpleBackgroundTransfer.BackgroundSession")
+                } else {
+                    configuration = NSURLSessionConfiguration.backgroundSessionConfiguration("com.example.apple-samplecode.SimpleBackgroundTransfer.BackgroundSession")
+                }
                 return NSURLSession(configuration: configuration, delegate: staticSelf, delegateQueue: nil)
                 }()
         }
@@ -130,7 +136,7 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
         
         if downloadTask === self.downloadTask {
             let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-            BLog(format: "DownloadTask: %@ progress: %lf", downloadTask, progress)
+            BLog(format: "DownloadTask: %@ progress: %lf", args: downloadTask, progress)
             dispatch_async(dispatch_get_main_queue()) {
                 self.progressView.progress = Float(progress)
             }
@@ -147,29 +153,28 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
         */
         let fileManager = NSFileManager.defaultManager()
         
-        let URLs = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask) as! [NSURL]
+        let URLs = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask) as [NSURL]
         let documentsDirectory = URLs[0]
         
-        let originalURL = downloadTask.originalRequest.URL!
+        let originalURL = downloadTask.originalRequest!.URL!
         let destinationURL = documentsDirectory.URLByAppendingPathComponent(originalURL.lastPathComponent!)
-        var errorCopy: NSError? = nil
         
-        // For the purposes of testing, remove any esisting file at the destination.
-        fileManager.removeItemAtURL(destinationURL, error: nil)
-        let success = fileManager.copyItemAtURL(downloadURL, toURL: destinationURL, error: &errorCopy)
-        
-        if success {
+        do {
+            // For the purposes of testing, remove any esisting file at the destination.
+            try fileManager.removeItemAtURL(destinationURL)
+
+            try fileManager.copyItemAtURL(downloadURL, toURL: destinationURL)
             dispatch_async(dispatch_get_main_queue()) {
                 let image = UIImage(contentsOfFile: destinationURL.path!)
                 self.imageView.image = image
                 self.imageView.hidden = false
                 self.progressView.hidden = true
             }
-        } else {
+        } catch let errorCopy as NSError {
             /*
             In the general case, what you might do in the event of failure depends on the error and the specifics of your application.
             */
-            BLog(format: "Error during the copy: %@", errorCopy!.localizedDescription)
+            BLog(format: "Error during the copy: %@", args: errorCopy.localizedDescription)
         }
     }
     

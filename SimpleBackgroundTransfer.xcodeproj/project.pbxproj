@@ -17,6 +17,7 @@
 		D7123DD01ABD1EEE00DFD5C5 /* APLAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7123DCF1ABD1EEE00DFD5C5 /* APLAppDelegate.swift */; };
 		D7123DD21ABD1F5600DFD5C5 /* Prefix.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7123DD11ABD1F5600DFD5C5 /* Prefix.swift */; };
 		D7123DD41ABD22A500DFD5C5 /* APLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7123DD31ABD22A500DFD5C5 /* APLViewController.swift */; };
+		D7EC45A31B4A9C24002D53F3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D7EC45A21B4A9C24002D53F3 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		D7123DD11ABD1F5600DFD5C5 /* Prefix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Prefix.swift; sourceTree = "<group>"; };
 		D7123DD31ABD22A500DFD5C5 /* APLViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = APLViewController.swift; sourceTree = "<group>"; };
 		D72011141ABD41A9000DBC6A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		D7EC45A21B4A9C24002D53F3 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +85,7 @@
 		2807BBF0175C64B100A0B701 /* SimpleBackgroundTransfer */ = {
 			isa = PBXGroup;
 			children = (
+				D7EC45A21B4A9C24002D53F3 /* LaunchScreen.storyboard */,
 				D7123DD31ABD22A500DFD5C5 /* APLViewController.swift */,
 				D7123DCF1ABD1EEE00DFD5C5 /* APLAppDelegate.swift */,
 				2807BBFC175C64B100A0B701 /* Main.storyboard */,
@@ -129,7 +132,8 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = APL;
-				LastUpgradeCheck = 0500;
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Apple, Inc.";
 				TargetAttributes = {
 					2807BBE6175C64B100A0B701 = {
@@ -167,6 +171,7 @@
 				2807BC03175C64B100A0B701 /* Images.xcassets in Resources */,
 				2807BBF5175C64B100A0B701 /* InfoPlist.strings in Resources */,
 				28A334A2175D149F00FA827A /* ReadMe.txt in Resources */,
+				D7EC45A31B4A9C24002D53F3 /* LaunchScreen.storyboard in Resources */,
 				2807BBFE175C64B100A0B701 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -224,6 +229,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -284,6 +290,7 @@
 				GCC_PREFIX_HEADER = "SimpleBackgroundTransfer/SimpleBackgroundTransfer-Prefix.pch";
 				INFOPLIST_FILE = "SimpleBackgroundTransfer/SimpleBackgroundTransfer-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = SimpleBackgroundTransfer;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				WRAPPER_EXTENSION = app;
@@ -300,6 +307,7 @@
 				GCC_PREFIX_HEADER = "SimpleBackgroundTransfer/SimpleBackgroundTransfer-Prefix.pch";
 				INFOPLIST_FILE = "SimpleBackgroundTransfer/SimpleBackgroundTransfer-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = SimpleBackgroundTransfer;
 				WRAPPER_EXTENSION = app;
 			};
