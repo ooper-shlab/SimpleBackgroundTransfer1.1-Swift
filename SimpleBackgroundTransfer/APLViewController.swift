@@ -85,7 +85,7 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
     }
     
     
-    @IBAction func start(AnyObject) {
+    @IBAction func start(_: AnyObject) {
         if self.downloadTask != nil {
             return
         }
