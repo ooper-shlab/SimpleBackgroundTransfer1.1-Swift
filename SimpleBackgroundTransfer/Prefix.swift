@@ -14,6 +14,6 @@
 import Foundation
 
 
-func BLog(function: String = __FUNCTION__, format formatString: String = "", args: CVarArgType...) {
+func BLog(function: String = #function, format formatString: String = "", args: CVarArgType...) {
     NSLog("\(function) %@", String(format: formatString, arguments: args))
 }
