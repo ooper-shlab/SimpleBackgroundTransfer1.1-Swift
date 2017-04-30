@@ -57,7 +57,7 @@
 import UIKit
 
 @objc(APLViewController)
-class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDelegate, NSURLSessionDownloadDelegate {
+class ViewController: UIViewController, URLSessionDelegate, URLSessionTaskDelegate, URLSessionDownloadDelegate {
     
     
     
@@ -70,8 +70,8 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
     @IBOutlet private weak var imageView: UIImageView!
     @IBOutlet private weak var progressView: UIProgressView!
     
-    var session: NSURLSession!
-    var downloadTask: NSURLSessionDownloadTask?
+    var session: URLSession!
+    var downloadTask: URLSessionDownloadTask?
     
     
     override func viewDidLoad() {
@@ -80,8 +80,8 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
         self.session = self.backgroundSession
         
         self.progressView.progress = 0
-        self.imageView.hidden = false
-        self.progressView.hidden = true
+        self.imageView.isHidden = false
+        self.progressView.isHidden = true
     }
     
     
@@ -93,13 +93,13 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
         /*
         Create a new download task using the URL session. Tasks start in the “suspended” state; to start a task you need to explicitly call -resume on a task after creating it.
         */
-        let downloadURL = NSURL(string: DownloadURLString)!
-        let request = NSURLRequest(URL: downloadURL)
-        self.downloadTask = self.session.downloadTaskWithRequest(request)
+        let downloadURL = URL(string: DownloadURLString)!
+        let request = URLRequest(url: downloadURL)
+        self.downloadTask = self.session.downloadTask(with: request)
         self.downloadTask!.resume()
         
-        self.imageView.hidden = true
-        self.progressView.hidden = false
+        self.imageView.isHidden = true
+        self.progressView.isHidden = false
     }
     
     
@@ -108,17 +108,12 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
     */
     //### Using static var to get the disptach_once-similar effect.
     //### Removed (instance's) lazy var to avoid cyclic reference.
-    var backgroundSession: NSURLSession {
+    var backgroundSession: URLSession {
         struct My {
             static var staticSelf: ViewController!
-            static var backgroundSessionInstance: NSURLSession = {
-                let configuration: NSURLSessionConfiguration
-                if #available(iOS 8.0, *) {
-                    configuration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("com.example.apple-samplecode.SimpleBackgroundTransfer.BackgroundSession")
-                } else {
-                    configuration = NSURLSessionConfiguration.backgroundSessionConfiguration("com.example.apple-samplecode.SimpleBackgroundTransfer.BackgroundSession")
-                }
-                return NSURLSession(configuration: configuration, delegate: staticSelf, delegateQueue: nil)
+            static var backgroundSessionInstance: URLSession = {
+                let configuration = URLSessionConfiguration.background(withIdentifier: "com.example.apple-samplecode.SimpleBackgroundTransfer.BackgroundSession")
+                return URLSession(configuration: configuration, delegate: staticSelf, delegateQueue: nil)
                 }()
         }
         My.staticSelf = self
@@ -126,7 +121,7 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
     }
     
     
-    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         BLog()
         
         /*
@@ -137,38 +132,38 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
         if downloadTask === self.downloadTask {
             let progress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
             BLog(format: "DownloadTask: %@ progress: %lf", args: downloadTask, progress)
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 self.progressView.progress = Float(progress)
             }
         }
     }
     
     
-    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL downloadURL: NSURL) {
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo downloadURL: URL) {
         BLog()
         
         /*
         The download completed, you need to copy the file at targetPath before the end of this block.
         As an example, copy the file to the Documents directory of your app.
         */
-        let fileManager = NSFileManager.defaultManager()
+        let fileManager = FileManager.default
         
-        let URLs = fileManager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask) as [NSURL]
+        let URLs = fileManager.urls(for: .documentDirectory, in: .userDomainMask) as [URL]
         let documentsDirectory = URLs[0]
         
-        let originalURL = downloadTask.originalRequest!.URL!
-        let destinationURL = documentsDirectory.URLByAppendingPathComponent(originalURL.lastPathComponent!)
+        let originalURL = downloadTask.originalRequest!.url!
+        let destinationURL = documentsDirectory.appendingPathComponent(originalURL.lastPathComponent)
         
+        // For the purposes of testing, remove any esisting file at the destination.
+        _ = try? fileManager.removeItem(at: destinationURL)
         do {
-            // For the purposes of testing, remove any esisting file at the destination.
-            try fileManager.removeItemAtURL(destinationURL)
-
-            try fileManager.copyItemAtURL(downloadURL, toURL: destinationURL)
-            dispatch_async(dispatch_get_main_queue()) {
-                let image = UIImage(contentsOfFile: destinationURL.path!)
+            try fileManager.copyItem(at: downloadURL, to: destinationURL)
+            
+            DispatchQueue.main.async {
+                let image = UIImage(contentsOfFile: destinationURL.path)
                 self.imageView.image = image
-                self.imageView.hidden = false
-                self.progressView.hidden = true
+                self.imageView.isHidden = false
+                self.progressView.isHidden = true
             }
         } catch let errorCopy as NSError {
             /*
@@ -179,7 +174,7 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
     }
     
     
-    func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         BLog()
         
         if error == nil {
@@ -189,7 +184,7 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
         }
         
         let progress = Double(task.countOfBytesReceived) / Double(task.countOfBytesExpectedToReceive)
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             self.progressView.progress = Float(progress)
         }
         
@@ -200,8 +195,8 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
     /*
     If an application has received an -application:handleEventsForBackgroundURLSession:completionHandler: message, the session delegate will receive this message to indicate that all messages previously enqueued for this session have been delivered. At this time it is safe to invoke the previously stored completion handler, or to begin any internal updates that will result in invoking the completion handler.
     */
-    func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         if let completionHandler = appDelegate.backgroundSessionCompletionHandler {
             appDelegate.backgroundSessionCompletionHandler = nil
             completionHandler()
@@ -211,7 +206,7 @@ class ViewController: UIViewController, NSURLSessionDelegate, NSURLSessionTaskDe
     }
     
     
-    func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didResumeAtOffset fileOffset: Int64, expectedTotalBytes: Int64) {
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didResumeAtOffset fileOffset: Int64, expectedTotalBytes: Int64) {
         BLog()
     }
     

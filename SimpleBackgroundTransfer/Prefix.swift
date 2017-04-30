@@ -5,6 +5,7 @@
 //  Translated by OOPer in cooperation with shlab.jp, on 2015/3/21.
 //
 //
+
 //
 //  Prefix header
 //
@@ -14,6 +15,6 @@
 import Foundation
 
 
-func BLog(function: String = #function, format formatString: String = "", args: CVarArgType...) {
+func BLog(_ function: String = #function, format formatString: String = "", args: CVarArg...) {
     NSLog("\(function) %@", String(format: formatString, arguments: args))
 }
