@@ -85,7 +85,7 @@ class ViewController: UIViewController, URLSessionDelegate, URLSessionTaskDelega
     }
     
     
-    @IBAction func start(_: AnyObject) {
+    @IBAction func start(_: Any) {
         if self.downloadTask != nil {
             return
         }
@@ -165,7 +165,7 @@ class ViewController: UIViewController, URLSessionDelegate, URLSessionTaskDelega
                 self.imageView.isHidden = false
                 self.progressView.isHidden = true
             }
-        } catch let errorCopy as NSError {
+        } catch let errorCopy {
             /*
             In the general case, what you might do in the event of failure depends on the error and the specifics of your application.
             */
